@@ -393,11 +393,22 @@ function render(palavra) {
   }
 }
 
+// Busca/renderização funcionam sempre (não dependem do Word) — só a
+// inserção de verdade (dentro de inserirNoDocumento/inserirVetorNoDocumento)
+// precisa do contexto do Word, e já trata isso com try/catch próprio.
+document.getElementById('go').onclick = () => render(document.getElementById('word').value);
+document.getElementById('word').addEventListener('keydown', e => { if (e.key==='Enter') render(e.target.value); });
+render('mostrarão');
+
+let dentroDoWord = false;
 Office.onReady((info) => {
-  if (info.host === Office.HostType.Word) {
-    document.getElementById('go').onclick = () => render(document.getElementById('word').value);
-    document.getElementById('word').addEventListener('keydown', e => { if (e.key==='Enter') render(e.target.value); });
-    render('mostrarão');
+  dentroDoWord = (info.host === Office.HostType.Word);
+  const status = document.getElementById('status');
+  if (!dentroDoWord) {
+    const aviso = document.createElement('div');
+    aviso.style.cssText = 'margin-top:8px;padding:6px 8px;background:#FDF3DD;border:1px solid #F0DBA0;border-radius:6px;font-size:10.5px;color:#8A6D1D;';
+    aviso.textContent = 'Rodando fora do Word — a busca funciona, mas os botões "Inserir" só funcionam dentro do Word de verdade.';
+    document.querySelector('.body').insertBefore(aviso, document.getElementById('word').closest('.row'));
   }
 });
 </script>
